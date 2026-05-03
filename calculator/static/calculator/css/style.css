@@ -1,0 +1,375 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #1e2124;
+    color: #e0e0e0;
+    padding: 20px;
+}
+
+/* Cabeçalho */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #282b30;
+    padding: 15px 30px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #424549;
+}
+
+.class-selector select {
+    padding: 8px;
+    margin-left: 10px;
+    border-radius: 4px;
+    background-color: #36393e;
+    color: white;
+    border: 1px solid #7289da;
+}
+
+/* Layout Principal */
+.container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Painel de Equipamentos */
+.equipment-panel {
+    background-color: #282b30;
+    border: 1px solid #424549;
+    border-radius: 8px;
+    padding: 20px;
+    flex: 2;
+}
+
+/* Sistema de Abas */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #424549;
+    margin-bottom: 20px;
+}
+
+.tab-link {
+    background: none;
+    border: none;
+    color: #b9bbbe;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.tab-link:hover {
+    color: #ffffff;
+}
+
+.tab-link.active {
+    color: #7289da;
+    border-bottom: 3px solid #7289da;
+    margin-bottom: -2px;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Grid de Equipamentos - O Segredo do Layout */
+.equip-grid {
+    display: grid;
+    /* Definimos 3 colunas, com a coluna central sendo mais larga para o boneco */
+    grid-template-columns: 80px 180px 80px;
+    /* 5 Linhas de grid para alocar perfeitamente os 10 itens em volta */
+    grid-template-areas: 
+        "topo avatar meio"
+        "armadura avatar baixo"
+        "mao-direita avatar mao-esquerda"
+        "capa avatar bota"
+        "acc1 avatar acc2";
+    gap: 15px;
+    justify-content: center;
+}
+
+.slot {
+    background-color: #36393e;
+    border: 2px dashed #5c5f66;
+    border-radius: 6px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 11px;
+    color: #99aab5;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.slot:hover {
+    border-color: #7289da;
+}
+
+/* Mapeamento de Áreas do Grid */
+.topo { grid-area: topo; }
+.meio { grid-area: meio; }
+.baixo { grid-area: baixo; }
+.mao-direita { grid-area: mao-direita; }
+.mao-esquerda { grid-area: mao-esquerda; }
+.armadura { grid-area: armadura; }
+.capa { grid-area: capa; }
+.bota { grid-area: bota; }
+.acc1 { grid-area: acc1; }
+.acc2 { grid-area: acc2; }
+
+.character-avatar {
+    grid-area: avatar;
+    background-color: #1e2124;
+    border: 1px solid #424549;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #7289da;
+}
+
+/* Estilização específica da grid visual (opcional) */
+.visual-grid .slot {
+    border-color: #a672da; 
+}
+.visual-grid .slot:hover {
+    border-color: #c9a4ef;
+}
+
+/* Painel de Atributos */
+.attributes-panel {
+    background-color: #282b30;
+    border: 1px solid #424549;
+    border-radius: 8px;
+    padding: 20px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.attributes-panel h2 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    border-bottom: 1px solid #424549;
+    padding-bottom: 10px;
+}
+
+/* Seletor de Nível */
+.level-selector {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #424549;
+}
+
+.level-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.level-row:last-child {
+    margin-bottom: 0;
+}
+
+.level-row input[type="number"] {
+    width: 60px;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #5c5f66;
+    background-color: #36393e;
+    color: white;
+    text-align: center;
+}
+
+.level-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #7289da;
+    cursor: pointer;
+}
+
+.attr-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.attr-row label {
+    font-weight: bold;
+    width: 40px;
+}
+
+.attr-row input {
+    width: 60px;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #5c5f66;
+    background-color: #36393e;
+    color: white;
+    text-align: center;
+}
+
+.attr-cost {
+    font-size: 12px;
+    color: #99aab5;
+}
+
+.status-points {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #424549;
+    text-align: center;
+}
+
+/* Painel de Resultados de Combate */
+.combat-results {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #424549;
+}
+
+.combat-results h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #7289da;
+}
+
+.combat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* Modal de Busca de Item */
+.modal {
+    display: none; /* Oculto por padrão */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #282b30;
+    border: 1px solid #424549;
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #b9bbbe;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-button:hover {
+    color: #ffffff;
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #5c5f66;
+    background-color: #36393e;
+    color: white;
+}
+
+.search-button {
+    padding: 8px 15px;
+    border-radius: 4px;
+    border: none;
+    background-color: #7289da;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.search-button:hover {
+    background-color: #5b6eae;
+}
+
+.item-list-prototype {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.item-card {
+    display: flex;
+    gap: 15px;
+    background-color: #36393e;
+    border: 1px solid #424549;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.item-card:hover {
+    border-color: #7289da;
+}
+
+.item-icon {
+    width: 45px;
+    height: 45px;
+    background-color: #1e2124;
+    border: 1px solid #5c5f66;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #99aab5;
+}
+
+.item-info h4 {
+    font-size: 15px;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.item-info p {
+    font-size: 13px;
+    color: #99aab5;
+}
