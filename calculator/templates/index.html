@@ -13,6 +13,17 @@
 <body>
     <header class="top-bar">
         <h1>Calculadora de Build RO</h1>
+        
+        <div class="build-controls" style="display: flex; gap: 10px; align-items: center; margin-right: auto; margin-left: 30px;">
+            <input type="text" id="build-name" placeholder="Nome da Build" style="padding: 8px; border-radius: 4px; background-color: #36393e; color: white; border: 1px solid #7289da;">
+            <button onclick="salvarBuild()" style="padding: 8px 15px; background-color: #43b581; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Salvar</button>
+            
+            <select id="load-build-select" style="padding: 8px; border-radius: 4px; background-color: #36393e; color: white; border: 1px solid #7289da; margin-left: 10px;">
+                <option value="">Carregar Build...</option>
+            </select>
+            <button onclick="carregarBuild()" style="padding: 8px 15px; background-color: #7289da; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Carregar</button>
+        </div>
+
         <div class="class-selector">
             <label for="classe">Classe do Personagem:</label>
             <select id="classe" name="classe">

@@ -1,6 +1,10 @@
 import requests
+import json
 from django.conf import settings
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Build
 
 class ItemCache:
     """Padrão Singleton: Garante uma única instância de cache na memória."""
@@ -102,3 +106,52 @@ def search_item(request):
         })
             
     return render(request, 'item_results.html', {'items': items, 'query': query, 'error_message': error_message})
+
+@csrf_exempt
+def save_build(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            build = Build.objects.create(
+                nome=data.get('nome', 'Build sem nome'),
+                classe=data.get('classe', 'cavaleiro'),
+                nivel=int(data.get('nivel', 1)),
+                transclasse=data.get('transclasse', False),
+                forca=int(data.get('str', 1)),
+                agilidade=int(data.get('agi', 1)),
+                vitalidade=int(data.get('vit', 1)),
+                inteligencia=int(data.get('int', 1)),
+                destreza=int(data.get('dex', 1)),
+                sorte=int(data.get('luk', 1)),
+                equipamentos=data.get('equipamentos', {})
+            )
+            return JsonResponse({'status': 'success', 'build_id': build.id})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'invalid method'}, status=405)
+
+def list_builds(request):
+    builds = Build.objects.all().values('id', 'nome', 'classe', 'nivel')
+    return JsonResponse({'builds': list(builds)})
+
+def load_build(request, build_id):
+    try:
+        build = Build.objects.get(id=build_id)
+        data = {
+            'nome': build.nome,
+            'classe': build.classe,
+            'nivel': build.nivel,
+            'transclasse': build.transclasse,
+            'atributos': {
+                'str': build.forca,
+                'agi': build.agilidade,
+                'vit': build.vitalidade,
+                'int': build.inteligencia,
+                'dex': build.destreza,
+                'luk': build.sorte
+            },
+            'equipamentos': build.equipamentos
+        }
+        return JsonResponse({'status': 'success', 'build': data})
+    except Build.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Build não encontrada'}, status=404)

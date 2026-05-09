@@ -236,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Roda uma vez ao carregar a página
     calcularCustoAtributos();
     atualizarSprite();
+    carregarListaBuilds();
 });
 
 // Função para atualizar a imagem do boneco com base na classe selecionada
@@ -337,6 +338,157 @@ function equipItem(id, name, iconUrl, attack, defense, str, agi, vit, int, dex, 
         atualizarPersonagem(); // Recalcula tudo ao equipar
     }
     closeModal();
+}
+
+// --- Sistema de Salvar e Carregar Builds ---
+
+function salvarBuild() {
+    const nome = document.getElementById('build-name').value;
+    if (!nome) {
+        alert("Por favor, dê um nome para a sua build!");
+        return;
+    }
+
+    const classe = document.getElementById('classe').value;
+    const nivel = document.getElementById('level').value;
+    const transclasse = document.getElementById('is-transclass').checked;
+
+    const atributosInputs = document.querySelectorAll('.attr-row input[type="number"]');
+    
+    const equipamentos = {};
+    const slots = document.querySelectorAll('.equip-grid .slot');
+    slots.forEach(slot => {
+        if (slot.dataset.itemId) {
+            const slotKey = slot.classList[1]; // Pega a classe específica do grid (ex: 'topo', 'mao-direita')
+            equipamentos[slotKey] = {
+                id: slot.dataset.itemId,
+                attack: slot.dataset.attack || 0,
+                defense: slot.dataset.defense || 0,
+                str: slot.dataset.str || 0,
+                agi: slot.dataset.agi || 0,
+                vit: slot.dataset.vit || 0,
+                int: slot.dataset.int || 0,
+                dex: slot.dataset.dex || 0,
+                luk: slot.dataset.luk || 0,
+                icon: slot.querySelector('img') ? slot.querySelector('img').src : ''
+            };
+        }
+    });
+
+    const buildData = {
+        nome: nome,
+        classe: classe,
+        nivel: nivel,
+        transclasse: transclasse,
+        str: atributosInputs[0].value,
+        agi: atributosInputs[1].value,
+        vit: atributosInputs[2].value,
+        int: atributosInputs[3].value,
+        dex: atributosInputs[4].value,
+        luk: atributosInputs[5].value,
+        equipamentos: equipamentos
+    };
+
+    fetch('/build/save/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(buildData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Build salva com sucesso!");
+            carregarListaBuilds();
+        } else {
+            alert("Erro ao salvar: " + data.message);
+        }
+    });
+}
+
+function carregarListaBuilds() {
+    fetch('/build/list/')
+    .then(response => response.json())
+    .then(data => {
+        const select = document.getElementById('load-build-select');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">Carregar Build...</option>';
+        data.builds.forEach(build => {
+            const option = document.createElement('option');
+            option.value = build.id;
+            option.textContent = `${build.nome} (${build.classe} Nv.${build.nivel})`;
+            select.appendChild(option);
+        });
+    });
+}
+
+function carregarBuild() {
+    const buildId = document.getElementById('load-build-select').value;
+    if (!buildId) return;
+
+    fetch(`/build/load/${buildId}/`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const build = data.build;
+            
+            document.getElementById('build-name').value = build.nome;
+            document.getElementById('classe').value = build.classe;
+            document.getElementById('level').value = build.nivel;
+            document.getElementById('is-transclass').checked = build.transclasse;
+            
+            const atributosInputs = document.querySelectorAll('.attr-row input[type="number"]');
+            atributosInputs[0].value = build.atributos.str;
+            atributosInputs[1].value = build.atributos.agi;
+            atributosInputs[2].value = build.atributos.vit;
+            atributosInputs[3].value = build.atributos.int;
+            atributosInputs[4].value = build.atributos.dex;
+            atributosInputs[5].value = build.atributos.luk;
+
+            const slots = document.querySelectorAll('.equip-grid .slot');
+            slots.forEach(slot => {
+                if (!slot.dataset.originalText) {
+                    slot.dataset.originalText = slot.innerText;
+                }
+                
+                const slotKey = slot.classList[1];
+                
+                if (build.equipamentos && build.equipamentos[slotKey]) {
+                    const item = build.equipamentos[slotKey];
+                    slot.innerHTML = `<a href="https://www.divine-pride.net/database/item/${item.id}?server=bRO" onclick="event.preventDefault();"><img src="${item.icon}" alt="Item" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;"></a>`;
+                    
+                    slot.dataset.itemId = item.id;
+                    slot.dataset.attack = item.attack;
+                    slot.dataset.defense = item.defense;
+                    slot.dataset.str = item.str;
+                    slot.dataset.agi = item.agi;
+                    slot.dataset.vit = item.vit;
+                    slot.dataset.int = item.int;
+                    slot.dataset.dex = item.dex;
+                    slot.dataset.luk = item.luk;
+                } else {
+                    // Desequipa se a build salva não tiver item nesse slot
+                    slot.innerHTML = slot.dataset.originalText;
+                    delete slot.dataset.itemId;
+                    delete slot.dataset.attack;
+                    delete slot.dataset.defense;
+                    delete slot.dataset.str;
+                    delete slot.dataset.agi;
+                    delete slot.dataset.vit;
+                    delete slot.dataset.int;
+                    delete slot.dataset.dex;
+                    delete slot.dataset.luk;
+                }
+            });
+
+            atualizarSprite();
+            calcularCustoAtributos(); // A função de calcular custo reconstrói os atributos no seu Decorator
+            
+            alert("Build carregada com sucesso!");
+        }
+    });
 }
 
 // Remove o item e restaura o texto vazio
