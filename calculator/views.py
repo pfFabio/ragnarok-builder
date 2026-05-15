@@ -25,6 +25,44 @@ class ItemCache:
 # Cria (ou recupera) a instância única do nosso cache
 item_cache = ItemCache()
 
+class DivinePrideFacade:
+    """Padrão Facade: Oculta a complexidade de comunicação e parsing com a API externa."""
+    
+    @staticmethod
+    def buscar_item(item_id):
+        api_key = settings.DIVINE_PRIDE_API_KEY
+        url = f"https://www.divine-pride.net/api/database/Item/{item_id}?apiKey={api_key}&server=bRO"
+        
+        try:
+            response = requests.get(url, headers={'Accept-Language': 'pt-BR'})
+            if response.status_code == 200:
+                data = response.json()
+                return DivinePrideFacade._limpar_dados(data), None
+            elif response.status_code == 404:
+                return None, f"Nenhum item com o ID '{item_id}' foi encontrado no Divine Pride."
+            else:
+                return None, "Erro desconhecido ao acessar a API do Divine Pride."
+        except requests.RequestException:
+            return None, "Erro de conexão ao acessar a API do Divine Pride."
+            
+    @staticmethod
+    def _limpar_dados(data):
+        """Método privado do Facade para tratar as regras de negócio de tipos e locations."""
+        location = data.get('location', 0)
+        item_type = data.get('type', 0)
+        
+        try: location = int(location) if location else 0
+        except (ValueError, TypeError): location = 0
+            
+        if location == 0 and item_type == 5:
+            try: location = int(data.get('subtype') or 0)
+            except (ValueError, TypeError): pass
+            
+        data['location'] = location
+        data['attack'] = int(data.get('attack') or 0)
+        data['defense'] = int(data.get('defense') or 0)
+        return data
+
 def index(request):
     return render(request, 'index.html')
 
@@ -46,57 +84,19 @@ def search_item(request):
     data = item_cache.get_item(item_id)
         
     if not data:
-        api_key = settings.DIVINE_PRIDE_API_KEY
-        url = f"https://www.divine-pride.net/api/database/Item/{item_id}?apiKey={api_key}&server=bRO"
-        try:
-            response = requests.get(url, headers={'Accept-Language': 'pt-BR'})
-            if response.status_code == 200:
-                data = response.json()
-                item_cache.set_item(item_id, data)
-            elif response.status_code == 404:
-                error_message = f"Nenhum item com o ID '{item_id}' foi encontrado no Divine Pride."
-        except requests.RequestException:
-            error_message = "Erro de conexão ao acessar a API do Divine Pride."
+        data, error_message = DivinePrideFacade.buscar_item(item_id)
+        if data:
+            item_cache.set_item(item_id, data)
                 
     if data:
-        location = data.get('location')
-        item_type = data.get('type', 0)
-        raw_atk = data.get('attack', 0)
-        raw_dfn = data.get('defense', 0)
-        
-        # Garante que a location seja um número, mesmo se a API falhar
-        try:
-            location = int(location) if location else 0
-        except (ValueError, TypeError):
-            location = 0
-        
-        # Fallback de segurança: Quando buscamos itens antigos no servidor bRO, a API
-        # pode não preencher o campo "location". Porém, para chapéus e equipamentos (Type 5),
-        # o campo "subtype" carrega exatamente a mesma máscara de bits necessária!
-        if location == 0 and item_type == 5:
-            try:
-                location = int(data.get('subtype') or 0)
-            except (ValueError, TypeError):
-                pass
-
-        try:
-            atk = int(raw_atk) if raw_atk is not None else 0
-        except (ValueError, TypeError):
-            atk = 0
-            
-        try:
-            dfn = int(raw_dfn) if raw_dfn is not None else 0
-        except (ValueError, TypeError):
-            dfn = 0
-            
         item_stats = data.get('stat') or {}
         
         items.append({
             'id': data.get('id'),
             'name': data.get('name'),
             'icon': f"https://static.divine-pride.net/images/items/item/{data.get('id')}.png",
-            'attack': atk,
-            'defense': dfn,
+            'attack': data.get('attack', 0),
+            'defense': data.get('defense', 0),
             'str': item_stats.get('str', 0),
             'agi': item_stats.get('agi', 0),
             'vit': item_stats.get('vit', 0),

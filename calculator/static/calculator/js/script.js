@@ -56,6 +56,48 @@ class EquipamentoDecorator extends PersonagemDecorator {
     get def() { return super.def + (parseInt(this.item.defense) || 0); }
 }
 
+// --- Padrão de Projeto: Strategy ---
+// Define como os cálculos de combate mudam dependendo da estratégia (Física vs Mágica)
+class CalculoCombateStrategy {
+    calcular(personagem, nivel) { throw new Error("Método calcular deve ser implementado."); }
+}
+
+class CalculoFisicoStrategy extends CalculoCombateStrategy {
+    calcular(personagem, nivel) {
+        // Status ATQ (Corpo a Corpo) = STR + (DEX/5) + (LUK/3) + (Level/4)
+        let statusAtk = Math.floor(personagem.str + (personagem.dex / 5) + (personagem.luk / 3) + (nivel / 4));
+        let totalAtk = statusAtk + personagem.atk;
+        let aspd = Math.min(193, Math.floor(156 + (personagem.agi * 10 + personagem.dex) / 40));
+        
+        return { tipoAtaque: "Ataque Físico (ATQ)", atkDisplay: `${totalAtk} (${statusAtk} + ${personagem.atk})`, aspd: aspd };
+    }
+}
+
+class CalculoMagicoStrategy extends CalculoCombateStrategy {
+    calcular(personagem, nivel) {
+        // Status ATQM (Mágico) = INT + (DEX/5) + (LUK/3) + (Level/4)
+        let statusMatk = Math.floor(personagem.int + (personagem.dex / 5) + (personagem.luk / 3) + (nivel / 4));
+        let totalMatk = statusMatk + personagem.atk; // Aqui seria + personagem.matk num cenário real expandido
+        let aspd = Math.min(193, Math.floor(156 + (personagem.agi * 10 + personagem.dex) / 40));
+        
+        return { tipoAtaque: "Ataque Mágico (ATQM)", atkDisplay: `${totalMatk} (${statusMatk} + ${personagem.atk})`, aspd: aspd };
+    }
+}
+
+// --- Padrão de Projeto: Factory Method ---
+// Fábrica para centralizar a criação e escolha da estratégia correta
+class EstrategiaCombateFactory {
+    static criarEstrategia(classeNome) {
+        const classesMagicas = ['bruxo', 'sacerdote', 'sabio', 'espiritualista'];
+        
+        if (classesMagicas.includes(classeNome)) {
+            return new CalculoMagicoStrategy();
+        } else {
+            return new CalculoFisicoStrategy();
+        }
+    }
+}
+
 let personagemAtual = new PersonagemBase(); // Estado global do personagem
 
 // Função responsável por alternar entre as abas de Equipamentos e Visuais
@@ -190,21 +232,24 @@ function atualizarPersonagem() {
     // --- Cálculos de Combate (Fórmula Renovação) ---
     const levelInput = document.getElementById('level');
     let nivel = parseInt(levelInput ? levelInput.value : 1) || 1;
+    const classSelect = document.getElementById('classe');
+    let classeNome = classSelect ? classSelect.value : 'cavaleiro';
     
-    // Status ATQ (Corpo a Corpo) = STR + (DEX/5) + (LUK/3) + (Level/4)
-    let statusAtk = Math.floor(personagemAtual.str + (personagemAtual.dex / 5) + (personagemAtual.luk / 3) + (nivel / 4));
-    let totalAtk = statusAtk + personagemAtual.atk;
+    // Aplica o Padrão Strategy criado delegando a responsabilidade para a Factory
+    let estrategiaCalculo = EstrategiaCombateFactory.criarEstrategia(classeNome);
     
-    // ASPD Base simplificada (156) + bônus de status (Limite 193)
-    let aspd = Math.min(193, Math.floor(156 + (personagemAtual.agi * 10 + personagemAtual.dex) / 40));
+    const resultadosCombate = estrategiaCalculo.calcular(personagemAtual, nivel);
     
     // Atualiza a Interface
     const aspdEl = document.getElementById('calc-aspd');
     const atkEl = document.getElementById('calc-atk');
     const defEl = document.getElementById('calc-def');
     
-    if (aspdEl) aspdEl.textContent = aspd;
-    if (atkEl) atkEl.textContent = `${totalAtk} (${statusAtk} + ${personagemAtual.atk})`;
+    if (aspdEl) aspdEl.textContent = resultadosCombate.aspd;
+    if (atkEl) {
+        atkEl.textContent = resultadosCombate.atkDisplay;
+        atkEl.previousElementSibling.textContent = resultadosCombate.tipoAtaque + ":"; // Atualiza a label
+    }
     if (defEl) defEl.textContent = personagemAtual.def;
 }
 
@@ -230,7 +275,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Adiciona o evento para atualizar o sprite quando a classe for alterada
     const classSelect = document.getElementById('classe');
     if (classSelect) {
-        classSelect.addEventListener('change', atualizarSprite);
+        classSelect.addEventListener('change', () => {
+            atualizarSprite();
+            atualizarPersonagem(); // Recalcula usando a strategy certa quando muda a classe
+        });
     }
     
     // Roda uma vez ao carregar a página
