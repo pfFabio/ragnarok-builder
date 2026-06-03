@@ -1,5 +1,4 @@
-// --- Padrão de Projeto: Decorator ---
-// Base do Personagem (Personagem "nu" e nível 1)
+
 class PersonagemBase {
     get str() { return 0; }
     get agi() { return 0; }
@@ -11,7 +10,6 @@ class PersonagemBase {
     get def() { return 0; }
 }
 
-// Decorator Base (Ele apenas repassa o status do objeto que ele está envolvendo)
 class PersonagemDecorator {
     constructor(personagem) {
         this.personagem = personagem;
@@ -26,7 +24,6 @@ class PersonagemDecorator {
     get def() { return this.personagem.def; }
 }
 
-// Decorator para somar atributos base da interface
 class AtributosDecorator extends PersonagemDecorator {
     constructor(personagem, atributos) {
         super(personagem);
@@ -40,7 +37,6 @@ class AtributosDecorator extends PersonagemDecorator {
     get luk() { return super.luk + (this.atributos.luk || 0); }
 }
 
-// Decorator para somar status de um equipamento
 class EquipamentoDecorator extends PersonagemDecorator {
     constructor(personagem, item) {
         super(personagem);
@@ -56,15 +52,12 @@ class EquipamentoDecorator extends PersonagemDecorator {
     get def() { return super.def + (parseInt(this.item.defense) || 0); }
 }
 
-// --- Padrão de Projeto: Strategy ---
-// Define como os cálculos de combate mudam dependendo da estratégia (Física vs Mágica)
 class CalculoCombateStrategy {
     calcular(personagem, nivel) { throw new Error("Método calcular deve ser implementado."); }
 }
 
 class CalculoFisicoStrategy extends CalculoCombateStrategy {
     calcular(personagem, nivel) {
-        // Status ATQ (Corpo a Corpo) = STR + (DEX/5) + (LUK/3) + (Level/4)
         let statusAtk = Math.floor(personagem.str + (personagem.dex / 5) + (personagem.luk / 3) + (nivel / 4));
         let totalAtk = statusAtk + personagem.atk;
         let aspd = Math.min(193, Math.floor(156 + (personagem.agi * 10 + personagem.dex) / 40));
@@ -75,7 +68,6 @@ class CalculoFisicoStrategy extends CalculoCombateStrategy {
 
 class CalculoMagicoStrategy extends CalculoCombateStrategy {
     calcular(personagem, nivel) {
-        // Status ATQM (Mágico) = INT + (DEX/5) + (LUK/3) + (Level/4)
         let statusMatk = Math.floor(personagem.int + (personagem.dex / 5) + (personagem.luk / 3) + (nivel / 4));
         let totalMatk = statusMatk + personagem.atk; // Aqui seria + personagem.matk num cenário real expandido
         let aspd = Math.min(193, Math.floor(156 + (personagem.agi * 10 + personagem.dex) / 40));
@@ -84,8 +76,6 @@ class CalculoMagicoStrategy extends CalculoCombateStrategy {
     }
 }
 
-// --- Padrão de Projeto: Factory Method ---
-// Fábrica para centralizar a criação e escolha da estratégia correta
 class EstrategiaCombateFactory {
     static criarEstrategia(classeNome) {
         const classesMagicas = ['bruxo', 'sacerdote', 'sabio', 'espiritualista'];
@@ -98,31 +88,26 @@ class EstrategiaCombateFactory {
     }
 }
 
-let personagemAtual = new PersonagemBase(); // Estado global do personagem
+let personagemAtual = new PersonagemBase(); 
 
-// Função responsável por alternar entre as abas de Equipamentos e Visuais
 function openTab(evt, tabName) {
-    // Pega todos os elementos com class="tab-content" e esconde
     const tabContent = document.getElementsByClassName("tab-content");
     for (let i = 0; i < tabContent.length; i++) {
         tabContent[i].style.display = "none";
         tabContent[i].classList.remove("active");
     }
 
-    // Pega todos os elementos com class="tab-link" e remove a classe "active"
     const tabLinks = document.getElementsByClassName("tab-link");
     for (let i = 0; i < tabLinks.length; i++) {
         tabLinks[i].classList.remove("active");
     }
 
-    // Mostra a aba atual e adiciona a classe "active" ao botão que abriu a aba
     const currentTab = document.getElementById(tabName);
     currentTab.style.display = "block";
     currentTab.classList.add("active");
     evt.currentTarget.classList.add("active");
 }
 
-// Função para calcular o total de pontos de atributos disponíveis com base no Nível
 function calcularMaxPontos(nivel) {
     const isTransclass = document.getElementById('is-transclass').checked;
     // Define a base de pontos (100 para transclasse, 48 para personagens normais)
@@ -187,11 +172,10 @@ function calcularCustoAtributos() {
     atualizarPersonagem(); // Sempre que calcular custo, reconstrói o personagem
 }
 
-// Função que utiliza o Decorator para reconstruir e calcular o personagem do zero
 function atualizarPersonagem() {
     let personagem = new PersonagemBase(); // Nasce zerado
 
-    // 1. Aplica o Decorator de Atributos Base
+    
     const atributosInputs = document.querySelectorAll('.attr-row input[type="number"]');
     if(atributosInputs.length >= 6) {
         const atributosAtuais = {
@@ -205,7 +189,6 @@ function atualizarPersonagem() {
         personagem = new AtributosDecorator(personagem, atributosAtuais);
     }
 
-    // 2. Aplica um Decorator de Equipamento para cada item que ele veste (Apenas equipamentos reais)
     const slots = document.querySelectorAll('#equipados .slot');
     slots.forEach(slot => {
         if (slot.dataset.itemId) {
@@ -223,7 +206,7 @@ function atualizarPersonagem() {
         }
     });
 
-    personagemAtual = personagem; // Salva o personagem pronto e superpoderoso globalmente
+    personagemAtual = personagem; 
     
     console.log("=== Personagem Atualizado via Decorator ===");
     console.log("Atributos:", { STR: personagemAtual.str, AGI: personagemAtual.agi, VIT: personagemAtual.vit, INT: personagemAtual.int, DEX: personagemAtual.dex, LUK: personagemAtual.luk });
@@ -235,12 +218,10 @@ function atualizarPersonagem() {
     const classSelect = document.getElementById('classe');
     let classeNome = classSelect ? classSelect.value : 'cavaleiro';
     
-    // Aplica o Padrão Strategy criado delegando a responsabilidade para a Factory
     let estrategiaCalculo = EstrategiaCombateFactory.criarEstrategia(classeNome);
     
     const resultadosCombate = estrategiaCalculo.calcular(personagemAtual, nivel);
     
-    // Atualiza a Interface
     const aspdEl = document.getElementById('calc-aspd');
     const atkEl = document.getElementById('calc-atk');
     const defEl = document.getElementById('calc-def');
