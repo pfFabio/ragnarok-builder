@@ -1,0 +1,2 @@
+CREATE DATABASE builds_db;
+CREATE DATABASE items_db;

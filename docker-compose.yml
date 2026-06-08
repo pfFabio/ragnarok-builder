@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      # POSTGRES_DB acts as the default DB, the init.sql will create the others
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - ragnarok_network
+
+  build_service:
+    build: 
+      context: ./build_service
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./build_service:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=builds_db
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+    depends_on:
+      - db
+    networks:
+      - ragnarok_network
+
+  item_service:
+    build: 
+      context: ./item_service
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./item_service:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=items_db
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_PORT=5432
+    env_file:
+      - .env  # To load API_KEY for Divine Pride
+    depends_on:
+      - db
+    networks:
+      - ragnarok_network
+
+  api_gateway:
+    image: nginx:alpine
+    volumes:
+      - type: bind
+        source: C:\faculdade\api de ragnarok\api_gateway\nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\faculdade\api de ragnarok\frontend
+        target: /usr/share/nginx/html
+        read_only: true
+        bind:
+          create_host_path: true
+    ports:
+      - "80:80"
+    depends_on:
+      - build_service
+      - item_service
+    networks:
+      - ragnarok_network
+
+volumes:
+  postgres_data:
+
+networks:
+  ragnarok_network:

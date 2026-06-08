@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Build - Ragnarok Online</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.11"></script>
+    <script type="text/javascript" src="https://www.divine-pride.net/scripts/tooltip.js"></script>
+
+</head>
+
+<body>
+    <header class="top-bar">
+        <h1>Calculadora de Build RO</h1>
+
+        <div class="build-controls"
+            style="display: flex; gap: 10px; align-items: center; margin-right: auto; margin-left: 30px;">
+            <input type="text" id="build-name" placeholder="Nome da Build"
+                style="padding: 8px; border-radius: 4px; background-color: #36393e; color: white; border: 1px solid #7289da;">
+            <button onclick="salvarBuild()"
+                style="padding: 8px 15px; background-color: #43b581; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Salvar</button>
+
+            <select id="load-build-select"
+                style="padding: 8px; border-radius: 4px; background-color: #36393e; color: white; border: 1px solid #7289da; margin-left: 10px;">
+                <option value="">Carregar Build...</option>
+            </select>
+            <button onclick="carregarBuild()"
+                style="padding: 8px 15px; background-color: #7289da; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Carregar</button>
+        </div>
+
+        <div class="class-selector">
+            <label for="classe">Classe do Personagem:</label>
+            <select id="classe" name="classe">
+                <optgroup label="Classes 2-1">
+                    <option value="cavaleiro">Cavaleiro</option>
+                    <option value="bruxo">Bruxo</option>
+                    <option value="cacador">Caçador</option>
+                    <option value="sacerdote">Sacerdote</option>
+                    <option value="mercenario">Mercenário</option>
+                    <option value="ferreiro">Ferreiro</option>
+                </optgroup>
+                <optgroup label="Classes 2-2">
+                    <option value="templario">Templário</option>
+                    <option value="sabio">Sábio</option>
+                    <option value="bardo">Bardo</option>
+                    <option value="odalisca">Odalisca</option>
+                    <option value="arruaceiro">Arruaceiro</option>
+                </optgroup>
+                <optgroup label="Classes Expandidas">
+                    <option value="mestre_taekwon">Mestre Taekwon</option>
+                    <option value="espiritualista">Espiritualista</option>
+                    <option value="ninja">Ninja</option>
+                    <option value="justiceiro">Justiceiro</option>
+                </optgroup>
+            </select>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Painel de Equipamentos e Visuais -->
+        <section class="equipment-panel">
+            <div class="tabs">
+                <button class="tab-link active" onclick="openTab(event, 'equipados')">Equipamentos</button>
+                <button class="tab-link" onclick="openTab(event, 'visuais')">Visuais</button>
+            </div>
+
+            <!-- Aba de Equipamentos -->
+            <div id="equipados" class="tab-content active">
+                <div class="equip-grid">
+                    <div class="slot topo" onclick="openModal(this, 'Topo')">Topo</div>
+                    <div class="slot meio" onclick="openModal(this, 'Meio')">Meio</div>
+                    <div class="slot baixo" onclick="openModal(this, 'Baixo')">Baixo</div>
+                    <div class="slot mao-direita" onclick="openModal(this, 'Mão Direita')">Mão Direita</div>
+
+                    <!-- Área do Boneco -->
+                    <div class="character-avatar">
+                        <span>Boneco</span>
+                    </div>
+
+                    <div class="slot mao-esquerda" onclick="openModal(this, 'Mão Esquerda')">Mão Esquerda</div>
+                    <div class="slot armadura" onclick="openModal(this, 'Armadura')">Armadura</div>
+                    <div class="slot capa" onclick="openModal(this, 'Capa')">Capa</div>
+                    <div class="slot bota" onclick="openModal(this, 'Bota')">Bota</div>
+                    <div class="slot acc1" onclick="openModal(this, 'Acessório 1')">Acessório 1</div>
+                    <div class="slot acc2" onclick="openModal(this, 'Acessório 2')">Acessório 2</div>
+                </div>
+            </div>
+
+            <!-- Aba de Visuais -->
+            <div id="visuais" class="tab-content">
+                <div class="equip-grid visual-grid">
+                    <div class="slot topo" onclick="openModal(this, 'Topo Visual')">Topo Visual</div>
+                    <div class="slot meio" onclick="openModal(this, 'Meio Visual')">Meio Visual</div>
+                    <div class="slot baixo" onclick="openModal(this, 'Baixo Visual')">Baixo Visual</div>
+                    <div class="slot mao-direita" onclick="openModal(this, 'Mão Dir. Visual')">Mão Dir. Visual</div>
+
+                    <!-- Área do Boneco (Visuais) -->
+                    <div class="character-avatar">
+                        <span>Boneco</span>
+                    </div>
+
+                    <div class="slot mao-esquerda" onclick="openModal(this, 'Mão Esq. Visual')">Mão Esq. Visual</div>
+                    <div class="slot armadura" onclick="openModal(this, 'Armadura Visual')">Armadura Visual</div>
+                    <div class="slot capa" onclick="openModal(this, 'Capa Visual')">Capa Visual</div>
+                    <div class="slot bota" onclick="openModal(this, 'Bota Visual')">Bota Visual</div>
+                    <div class="slot acc1" onclick="openModal(this, 'Acessório 1 Vis.')">Acessório 1 Vis.</div>
+                    <div class="slot acc2" onclick="openModal(this, 'Acessório 2 Vis.')">Acessório 2 Vis.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Painel de Atributos -->
+        <section class="attributes-panel">
+            <h2>Atributos</h2>
+            <div class="level-selector">
+                <div class="level-row">
+                    <label for="level">Nível (1-250):</label>
+                    <input type="number" id="level" name="level" min="1" max="250" value="1">
+                </div>
+                <div class="level-row">
+                    <label for="is-transclass" style="font-weight: normal; font-size: 14px;">Transclasse (Base
+                        100)</label>
+                    <input type="checkbox" id="is-transclass" name="is-transclass">
+                </div>
+            </div>
+            <div class="attributes-list">
+                <div class="attr-row"><label>STR</label><input type="number" min="1" max="150" value="1"><span
+                        class="attr-cost">Custo: 2</span></div>
+                <div class="attr-row"><label>AGI</label><input type="number" min="1" max="150" value="1"><span
+                        class="attr-cost">Custo: 2</span></div>
+                <div class="attr-row"><label>VIT</label><input type="number" min="1" max="150" value="1"><span
+                        class="attr-cost">Custo: 2</span></div>
+                <div class="attr-row"><label>INT</label><input type="number" min="1" max="150" value="1"><span
+                        class="attr-cost">Custo: 2</span></div>
+                <div class="attr-row"><label>DEX</label><input type="number" min="1" max="150" value="1"><span
+                        class="attr-cost">Custo: 2</span></div>
+                <div class="attr-row"><label>LUK</label><input type="number" min="1" max="150" value="1"><span
+                        class="attr-cost">Custo: 2</span></div>
+            </div>
+            <div class="status-points">
+                <p>Pontos Restantes: <strong id="pontos-restantes">48</strong></p>
+            </div>
+
+            <!-- Painel de Resultados de Combate -->
+            <div class="combat-results">
+                <h3>Status de Combate</h3>
+                <div class="combat-row"><label>ASPD:</label><span id="calc-aspd">156</span></div>
+                <div class="combat-row"><label>Ataque (ATQ):</label><span id="calc-atk">0 (0 + 0)</span></div>
+                <div class="combat-row"><label>Defesa (DEF):</label><span id="calc-def">0</span></div>
+            </div>
+        </section>
+
+        <!-- Modal de Busca de Item -->
+        <div id="item-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeModal()">&times;</span>
+                <h2 id="modal-title">Selecionar Item</h2>
+                <div class="search-bar">
+                    <input type="hidden" id="modal-slot-name" name="slot" value="">
+                    <input type="text" id="item-search-q" name="q" placeholder="Digite o ID do item (ex: 1201)..."
+                        onkeypress="if(event.key === 'Enter') searchItem()">
+
+                    <button class="search-button" onclick="searchItem()">Buscar</button>
+                    <button class="search-button" style="background-color: #ff4d4d; margin-left: 5px;"
+                        onclick="unequipItem()">Remover</button>
+                </div>
+                <!-- É aqui dentro que o javascript vai injetar o HTML retornado -->
+                <div class="item-list-prototype" id="search-results">
+                    <p style="color: #99aab5; text-align: center; margin-top: 20px;">Digite o ID do item para buscar.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CLASS_IMG_PATH = "/img/classes/";
+    </script>
+    <script src="/js/script.js?v=2"></script>
+</body>
+
+</html>
