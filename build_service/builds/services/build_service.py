@@ -44,3 +44,12 @@ class BuildService:
             }
         except Build.DoesNotExist:
             return None
+
+    @staticmethod
+    def delete_build(build_id: int) -> bool:
+        try:
+            build = Build.objects.get(id=build_id)
+            build.delete()
+            return True
+        except Build.DoesNotExist:
+            return False

@@ -24,3 +24,13 @@ def load_build(request, build_id):
     if build_data:
         return JsonResponse({'status': 'success', 'build': build_data})
     return JsonResponse({'status': 'error', 'message': 'Build não encontrada'}, status=404)
+
+@csrf_exempt
+def delete_build(request, build_id):
+    if request.method != 'DELETE':
+        return JsonResponse({'status': 'invalid method'}, status=405)
+        
+    success = BuildService.delete_build(build_id)
+    if success:
+        return JsonResponse({'status': 'success', 'message': 'Build deletada com sucesso'})
+    return JsonResponse({'status': 'error', 'message': 'Build não encontrada'}, status=404)

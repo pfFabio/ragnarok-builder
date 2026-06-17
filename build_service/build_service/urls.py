@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.list_builds, name='list_builds'),
     path('save/', views.save_build, name='save_build'),
     path('<int:build_id>/', views.load_build, name='load_build'),
+    path('<int:build_id>/delete/', views.delete_build, name='delete_build'),
 ]

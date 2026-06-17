@@ -599,3 +599,34 @@ function searchItem() {
             resultsDiv.innerHTML = '<p style="color: #ff4d4d; text-align: center; margin-top: 20px;">Erro ao buscar item.</p>';
         });
 }
+
+function deletarBuild() {
+    const buildId = document.getElementById('load-build-select').value;
+    if (!buildId) {
+        alert("Selecione uma build na lista para deletar.");
+        return;
+    }
+
+    if (!confirm("Tem certeza que deseja deletar esta build? Esta ação não pode ser desfeita.")) {
+        return;
+    }
+
+    fetch(`${BUILD_API_URL}/${buildId}/delete/`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Build deletada com sucesso!");
+            carregarListaBuilds(); // Atualiza a lista removendo a deletada
+            
+            // Opcional: Limpar o campo de nome
+            document.getElementById('build-name').value = '';
+        } else {
+            alert("Erro ao deletar: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Erro ao conectar com o servidor para deletar.");
+    });
+}
