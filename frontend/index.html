@@ -63,10 +63,7 @@
     <main class="container">
         <!-- Painel de Equipamentos e Visuais -->
         <section class="equipment-panel">
-            <div class="tabs">
-                <button class="tab-link active" onclick="openTab(event, 'equipados')">Equipamentos</button>
-                <button class="tab-link" onclick="openTab(event, 'visuais')">Visuais</button>
-            </div>
+            <!-- Equipamentos -->
 
             <!-- Aba de Equipamentos -->
             <div id="equipados" class="tab-content active">
@@ -90,27 +87,7 @@
                 </div>
             </div>
 
-            <!-- Aba de Visuais -->
-            <div id="visuais" class="tab-content">
-                <div class="equip-grid visual-grid">
-                    <div class="slot topo" onclick="openModal(this, 'Topo Visual')">Topo Visual</div>
-                    <div class="slot meio" onclick="openModal(this, 'Meio Visual')">Meio Visual</div>
-                    <div class="slot baixo" onclick="openModal(this, 'Baixo Visual')">Baixo Visual</div>
-                    <div class="slot mao-direita" onclick="openModal(this, 'Mão Dir. Visual')">Mão Dir. Visual</div>
 
-                    <!-- Área do Boneco (Visuais) -->
-                    <div class="character-avatar">
-                        <span>Boneco</span>
-                    </div>
-
-                    <div class="slot mao-esquerda" onclick="openModal(this, 'Mão Esq. Visual')">Mão Esq. Visual</div>
-                    <div class="slot armadura" onclick="openModal(this, 'Armadura Visual')">Armadura Visual</div>
-                    <div class="slot capa" onclick="openModal(this, 'Capa Visual')">Capa Visual</div>
-                    <div class="slot bota" onclick="openModal(this, 'Bota Visual')">Bota Visual</div>
-                    <div class="slot acc1" onclick="openModal(this, 'Acessório 1 Vis.')">Acessório 1 Vis.</div>
-                    <div class="slot acc2" onclick="openModal(this, 'Acessório 2 Vis.')">Acessório 2 Vis.</div>
-                </div>
-            </div>
         </section>
 
         <!-- Painel de Atributos -->
