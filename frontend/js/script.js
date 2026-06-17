@@ -1,4 +1,10 @@
 
+// --- Configuração das URLs da API ---
+// Se estiver rodando localmente (Nginx), usa URLs relativas. Se estiver no Render, usa a URL completa.
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const BUILD_API_URL = IS_LOCAL ? '' : 'https://SEU-APP-BUILD.onrender.com'; // Substitua pelo link real do seu build-service no Render
+const ITEM_API_URL = IS_LOCAL ? '' : 'https://SEU-APP-ITEM.onrender.com';   // Substitua pelo link real do seu item-service no Render
+
 class PersonagemBase {
     get str() { return 0; }
     get agi() { return 0; }
@@ -418,7 +424,7 @@ function salvarBuild() {
         equipamentos: equipamentos
     };
 
-    fetch('/builds/save/', {
+    fetch(`${BUILD_API_URL}/builds/save/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -437,7 +443,7 @@ function salvarBuild() {
 }
 
 function carregarListaBuilds() {
-    fetch('/builds/')
+    fetch(`${BUILD_API_URL}/builds/`)
     .then(response => response.json())
     .then(data => {
         const select = document.getElementById('load-build-select');
@@ -457,7 +463,7 @@ function carregarBuild() {
     const buildId = document.getElementById('load-build-select').value;
     if (!buildId) return;
 
-    fetch(`/builds/${buildId}/`)
+    fetch(`${BUILD_API_URL}/builds/${buildId}/`)
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
@@ -550,7 +556,7 @@ function searchItem() {
     
     resultsDiv.innerHTML = '<p style="color: #99aab5; text-align: center; margin-top: 20px;">Buscando...</p>';
     
-    fetch(`/items/search/?q=${encodeURIComponent(q)}`)
+    fetch(`${ITEM_API_URL}/items/search/?q=${encodeURIComponent(q)}`)
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success' && data.item) {
