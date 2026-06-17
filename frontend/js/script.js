@@ -2,8 +2,8 @@
 // --- Configuração das URLs da API ---
 // Se estiver rodando localmente (Nginx), usa URLs relativas. Se estiver no Render, usa a URL completa.
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BUILD_API_URL = IS_LOCAL ? '' : 'https://ragnarok-build-service.onrender.com'; // Substitua pelo link real do seu build-service no Render
-const ITEM_API_URL = IS_LOCAL ? '' : 'https://ragnarok-item-service.onrender.com';   // Substitua pelo link real do seu item-service no Render
+const BUILD_API_URL = IS_LOCAL ? '/builds' : 'https://ragnarok-build-service.onrender.com';
+const ITEM_API_URL = IS_LOCAL ? '/items' : 'https://ragnarok-item-service.onrender.com';
 
 class PersonagemBase {
     get str() { return 0; }
@@ -424,7 +424,7 @@ function salvarBuild() {
         equipamentos: equipamentos
     };
 
-    fetch(`${BUILD_API_URL}/builds/save/`, {
+    fetch(`${BUILD_API_URL}/save/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -443,7 +443,7 @@ function salvarBuild() {
 }
 
 function carregarListaBuilds() {
-    fetch(`${BUILD_API_URL}/builds/`)
+    fetch(`${BUILD_API_URL}/`)
     .then(response => response.json())
     .then(data => {
         const select = document.getElementById('load-build-select');
@@ -463,7 +463,7 @@ function carregarBuild() {
     const buildId = document.getElementById('load-build-select').value;
     if (!buildId) return;
 
-    fetch(`${BUILD_API_URL}/builds/${buildId}/`)
+    fetch(`${BUILD_API_URL}/${buildId}/`)
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
@@ -556,7 +556,7 @@ function searchItem() {
     
     resultsDiv.innerHTML = '<p style="color: #99aab5; text-align: center; margin-top: 20px;">Buscando...</p>';
     
-    fetch(`${ITEM_API_URL}/items/search/?q=${encodeURIComponent(q)}`)
+    fetch(`${ITEM_API_URL}/search/?q=${encodeURIComponent(q)}`)
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success' && data.item) {
