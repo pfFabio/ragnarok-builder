@@ -5,6 +5,12 @@ Jogadores de **Ragnarok Online** frequentemente encontram dificuldades para plan
 
 A **API de Ragnarok** resolve este problema fornecendo uma plataforma web e microsserviços capazes de se integrar a bancos de dados oficiais (como o Divine Pride), buscar informações precisas sobre equipamentos e calcular/salvar as builds dos jogadores para uso futuro.
 
+### Funcionalidades Principais:
+- **Cálculo de Status em Tempo Real:** Simulação de pontos de atributos com a fórmula oficial do Ragnarok.
+- **Busca de Equipamentos:** Integração viva com a API do Divine Pride para buscar os bônus reais dos itens.
+- **Salvar e Carregar Builds:** Persistência das builds customizadas no banco de dados.
+- **Deletar Builds:** Possibilidade de excluir builds salvas que não são mais úteis.
+
 ---
 
 ## Justificativa Técnica das Escolhas Realizadas
@@ -18,7 +24,7 @@ Para resolver o problema proposto, optou-se pela utilização do framework **Dja
 O projeto foi estruturado em um ecossistema de microsserviços para separar as responsabilidades, facilitando manutenções e futuros dimensionamentos (escalonamento). A aplicação conta com:
 - **Build Service:** Responsável por criar, armazenar e gerenciar as builds e atributos dos personagens.
 - **Item Service:** Responsável por se comunicar com a API do Divine Pride, buscar e manter em cache os itens e equipamentos.
-- **API Gateway (Nginx):** Um proxy reverso orquestrado via Docker Compose que centraliza as rotas para o frontend e os respectivos serviços.
+- **API Gateway (Local):** No ambiente de desenvolvimento (Docker Compose), utilizamos o Nginx como proxy reverso para simular o roteamento e centralizar as portas. Em produção (Render), o frontend atua consumindo as APIs diretamente através de URLs independentes.
 - **Frontend / Calculator:** Camada de interface e lógica de apresentação para o usuário final.
 
 ### Organização utilizando Arquitetura Limpa (Clean Architecture)
@@ -69,7 +75,7 @@ Toda a aplicação foi conteinerizada visando portabilidade e consistência entr
 Na raiz do projeto, o arquivo `docker-compose.yml` declara:
 - Um serviço de Banco de Dados (`postgres`).
 - Os microsserviços da aplicação (`build_service` e `item_service`) provisionados via Dockerfiles individuais.
-- Um API Gateway em Nginx expondo o frontend e fazendo proxy reverso na porta `80`.
+- Um API Gateway em Nginx expondo o frontend e fazendo proxy reverso na porta `80` (utilizado apenas para orquestrar o ambiente local de desenvolvimento). Em produção, o sistema foi totalmente desacoplado para a nuvem.
 
 **Para executar localmente:**
 ```bash
