@@ -2,8 +2,8 @@
 // --- Configuração das URLs da API ---
 // Se estiver rodando localmente (Nginx), usa URLs relativas. Se estiver no Render, usa a URL completa.
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BUILD_API_URL = IS_LOCAL ? '' : 'https://SEU-APP-BUILD.onrender.com'; // Substitua pelo link real do seu build-service no Render
-const ITEM_API_URL = IS_LOCAL ? '' : 'https://SEU-APP-ITEM.onrender.com';   // Substitua pelo link real do seu item-service no Render
+const BUILD_API_URL = IS_LOCAL ? '' : 'https://ragnarok-build-service.onrender.com'; // Substitua pelo link real do seu build-service no Render
+const ITEM_API_URL = IS_LOCAL ? '' : 'https://ragnarok-item-service.onrender.com';   // Substitua pelo link real do seu item-service no Render
 
 class PersonagemBase {
     get str() { return 0; }

@@ -80,4 +80,6 @@ docker-compose up --build
 
 ## Deploy (Acesso ao Sistema Publicado)
 **Plataforma de Deploy:** Render
-**Link de acesso:** 
+**Link de acesso (Frontend):** https://ragnarok-frontend.onrender.com
+**API Build Service:** https://ragnarok-build-service.onrender.com
+**API Item Service:** https://ragnarok-item-service.onrender.com
